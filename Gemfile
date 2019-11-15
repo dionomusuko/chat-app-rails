@@ -22,7 +22,7 @@ gem 'jbuilder', '~> 2.7'
 # Use Active Model has_secure_password
 
 # add gems
-# gem 'bcrypt'
+gem 'bcrypt'
 gem 'devise'
 
 # Use Active Storage variant
