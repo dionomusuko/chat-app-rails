@@ -1,22 +1,33 @@
-import consumer from "./consumer"
+import consumer from './consumer'
 
-consumer.subscriptions.create("RoomChannel", {
-  // ...
-  // room_channel.rbでブロードキャストされたものがここに届く
-  received: function(data) {
-    return $('#messages').append(data['message']);
-  },
-  speak: function(message) {
-    return this.perform('speak', {
-      message: message
-    });
-  }
-});
+// $(function() {}; で囲むことでレンダリング後に実行される
+// レンダリング前に実行されると $('#messages').data('room_id') が取得できない
+$(function() {
+  const chatChannel = consumer.subscriptions.create({ channel: 'RoomChannel', room: $('#messages').data('room_id') }, {
+    connected() {
+      // Called when the subscription is ready for use on the server
+    },
 
-$(document).on('keypress', '[data-behavior~=room_speaker]', function(event) {
-  if (event.keyCode === 13) {
-    chatChannel.speak(event.target.value);
-    event.target.value = '';
-    return event.preventDefault();
-  }
+    disconnected() {
+      // Called when the subscription has been terminated by the server
+    },
+
+    received: function(data) {
+      return $('#messages').append(data['message']);
+    },
+
+    speak: function(message) {
+      return this.perform('speak', {
+        message: message
+      });
+    }
+  });
+
+  $(document).on('keypress', '[data-behavior~=room_speaker]', function(event) {
+    if (event.keyCode === 13) {
+      chatChannel.speak(event.target.value);
+      event.target.value = '';
+      return event.preventDefault();
+    }
+  });
 });
